@@ -8,6 +8,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"image"
 	"net/url"
+	"time"
 )
 
 type TOTP struct {
@@ -76,7 +77,22 @@ func (t TOTP) GetQR(size int) (TOTPQR, error) {
 
 func Validate(code int, secret string) (bool, error) {
 	// generate totp based on current timestamp
-	generatedCode, err := generateTotp(secret)
+	generatedCode, err := generateTotp(secret, time.Now().Unix())
+	if err != nil {
+		return false, err
+	}
+
+	// check if code is valid
+	if code == int(generatedCode) {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func ValidateWithTimestamp(code int, secret string, timestamp int64) (bool, error) {
+	// generate totp based on timestamp parameter
+	generatedCode, err := generateTotp(secret, timestamp)
 	if err != nil {
 		return false, err
 	}

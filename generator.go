@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"strings"
-	"time"
 )
 
 func generateSecret(length int) (string, error) {
@@ -20,7 +19,7 @@ func generateSecret(length int) (string, error) {
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buffer)[:length], nil
 }
 
-func generateTotp(secretKey string) (uint32, error) {
+func generateTotp(secretKey string, timestamp int64) (uint32, error) {
 	base32Decoder := base32.StdEncoding.WithPadding(base32.NoPadding)
 	// convert secret to uppercase and remove extra spaces
 	secretKey = strings.ToUpper(strings.TrimSpace(secretKey))
@@ -34,7 +33,7 @@ func generateTotp(secretKey string) (uint32, error) {
 	// unsigned integer slice
 	// convert timestamp to bytes, divide by 30
 	timeBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(timeBytes, uint64(time.Now().Unix())/30)
+	binary.BigEndian.PutUint64(timeBytes, uint64(timestamp)/30)
 
 	// timestamp bytes are concatenated with the decoded secret key bytes
 	// then a 20-byte SHA-1 hash is calculated from the byte slice
