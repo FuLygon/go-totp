@@ -34,12 +34,12 @@ func Generate(issuer, accountName string) TOTP {
 	return TOTP{
 		Issuer:      issuer,
 		AccountName: accountName,
-		Secret:      GenerateSecret(20),
+		Secret:      generateSecret(20),
 	}
 }
 
 func (t TOTP) GetURL() string {
-	uri := url.URL{
+	totpUrl := url.URL{
 		Scheme: "otpauth",
 		Host:   "totp",
 		Path:   label(t.Issuer, t.AccountName),
@@ -52,9 +52,9 @@ func (t TOTP) GetURL() string {
 	parameters.Add("issuer", t.Issuer)
 	parameters.Add("period", "30")
 	parameters.Add("secret", t.Secret)
-	uri.RawQuery = parameters.Encode()
+	totpUrl.RawQuery = parameters.Encode()
 
-	return uri.String()
+	return totpUrl.String()
 }
 
 func (t TOTP) GetQR(size int) (TOTPQR, error) {
@@ -97,7 +97,7 @@ func label(issuer, accountName string) string {
 	return fmt.Sprintf("%s:%s", issuer, accountName)
 }
 
-func GenerateSecret(length int) string {
+func generateSecret(length int) string {
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	b := make([]byte, length)
 	for i := range b {
