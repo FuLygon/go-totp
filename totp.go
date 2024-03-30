@@ -10,8 +10,6 @@ import (
 	"net/url"
 )
 
-const secretCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-
 type TOTP struct {
 	Issuer      string
 	AccountName string
