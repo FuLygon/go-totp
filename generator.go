@@ -17,7 +17,7 @@ func generateSecret(length int) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return base32.StdEncoding.EncodeToString(buffer)[:length], nil
+	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buffer)[:length], nil
 }
 
 func generateTotp(secretKey string) (uint32, error) {
