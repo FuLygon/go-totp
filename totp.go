@@ -8,6 +8,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"image"
 	"net/url"
+	"regexp"
 	"time"
 )
 
@@ -22,27 +23,38 @@ type TOTPQR struct {
 	Image  image.Image
 }
 
-func Generate(issuer, accountName string) (TOTP, error) {
-	secret, err := generateSecret(20)
+func Generate(issuer, accountName string) (totp TOTP, err error) {
+	totp.Issuer = issuer
+	totp.AccountName = accountName
+
+	// generate a base32 secret
+	totp.Secret, err = generateSecret(20)
 	if err != nil {
-		return TOTP{}, err
+		return
 	}
 
-	return TOTP{
-		Issuer:      issuer,
-		AccountName: accountName,
-		Secret:      secret,
-	}, nil
+	// validate totp info
+	err = totp.validateData()
+	if err != nil {
+		return
+	}
+
+	return
 }
 
-func (t TOTP) GetURL() string {
+func (t TOTP) GetURL() (string, error) {
+	// validate totp info
+	err := t.validateData()
+	if err != nil {
+		return "", err
+	}
+
 	totpUrl := url.URL{
 		Scheme: "otpauth",
 		Host:   "totp",
 		Path:   label(t.Issuer, t.AccountName),
 	}
 
-	// query parameter
 	parameters := url.Values{}
 	parameters.Add("algorithm", "SHA1")
 	parameters.Add("digits", "6")
@@ -51,11 +63,14 @@ func (t TOTP) GetURL() string {
 	parameters.Add("secret", t.Secret)
 	totpUrl.RawQuery = parameters.Encode()
 
-	return totpUrl.String()
+	return totpUrl.String(), nil
 }
 
 func (t TOTP) GetQR(size int) (TOTPQR, error) {
-	totpUrl := t.GetURL()
+	totpUrl, err := t.GetURL()
+	if err != nil {
+		return TOTPQR{}, err
+	}
 
 	// generate qrcode
 	bQR, err := qrcode.Encode(totpUrl, qrcode.Medium, size)
@@ -73,6 +88,26 @@ func (t TOTP) GetQR(size int) (TOTPQR, error) {
 		return TOTPQR{}, errors.New("failed to decode image: " + err.Error())
 	}
 	return TOTPQR{Base64: strB64, Image: img}, nil
+}
+
+func (t TOTP) validateData() error {
+	if t.Issuer == "" {
+		return errors.New("issuer cannot be empty")
+	}
+
+	if t.AccountName == "" {
+		return errors.New("account name cannot be empty")
+	}
+
+	if t.Secret == "" {
+		return errors.New("secret cannot be empty")
+	}
+
+	if !regexp.MustCompile("^[A-Z2-7]+$").MatchString(t.Secret) {
+		return errors.New("secret is not a valid base32")
+	}
+
+	return nil
 }
 
 func Validate(code int, secret string) (bool, error) {
