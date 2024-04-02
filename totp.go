@@ -66,14 +66,19 @@ func (t TOTP) GetURL() (string, error) {
 	return totpUrl.String(), nil
 }
 
-func (t TOTP) GetQR(size int) (TOTPQR, error) {
+func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, error) {
 	totpUrl, err := t.GetURL()
 	if err != nil {
 		return TOTPQR{}, err
 	}
 
+	// assign default value for qr code recovery level if not provided
+	if len(qrRecoveryLevel) < 1 {
+		qrRecoveryLevel[0] = qrcode.Medium
+	}
+
 	// generate qrcode
-	bQR, err := qrcode.Encode(totpUrl, qrcode.Medium, size)
+	bQR, err := qrcode.Encode(totpUrl, qrRecoveryLevel[0], size)
 	if err != nil {
 		return TOTPQR{}, errors.New("failed to encode QR code: " + err.Error())
 	}
