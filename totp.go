@@ -72,9 +72,9 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, 
 		return TOTPQR{}, err
 	}
 
-	// assign default value for qr code recovery level if not provided
+	// assign default value for qrcode recovery level if not provided
 	if len(qrRecoveryLevel) < 1 {
-		qrRecoveryLevel[0] = qrcode.Medium
+		qrRecoveryLevel = append(qrRecoveryLevel, qrcode.Medium)
 	}
 
 	// generate qrcode
