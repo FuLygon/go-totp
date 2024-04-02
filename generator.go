@@ -4,9 +4,12 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base32"
 	"encoding/binary"
 	"fmt"
+	"hash"
 	"strings"
 )
 
@@ -19,7 +22,7 @@ func generateSecret(length int) (string, error) {
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buffer)[:length], nil
 }
 
-func generateTotp(secretKey string, timestamp int64) (string, error) {
+func generateTotp(secretKey string, timestamp int64, algorithm Algorithm) (string, error) {
 	base32Decoder := base32.StdEncoding.WithPadding(base32.NoPadding)
 	// convert secret to uppercase and remove extra spaces
 	secretKey = strings.ToUpper(strings.TrimSpace(secretKey))
@@ -38,16 +41,28 @@ func generateTotp(secretKey string, timestamp int64) (string, error) {
 	// timestamp bytes are concatenated with the decoded secret key bytes
 	// then a 20-byte SHA-1 hash is calculated from the byte slice
 	// and the hash with 0x0F (15) to get a single-digit offset
-	hash := hmac.New(sha1.New, secretBytes)
-	hash.Write(timeBytes)
-	h := hash.Sum(nil)
-	offset := h[len(h)-1] & 0x0F
+	h := hmac.New(getHashInterfaces(algorithm), secretBytes)
+	h.Write(timeBytes)
+	b := h.Sum(nil)
+	offset := b[len(b)-1] & 0x0F
 
 	// truncate the SHA-1 by the offset and convert it into a 32-bit
 	// unsigned int and the 32-bit int with 0x7FFFFFFF (2147483647)
 	// to get a 31-bit unsigned int.
-	truncatedHash := binary.BigEndian.Uint32(h[offset:]) & 0x7FFFFFFF
+	truncatedHash := binary.BigEndian.Uint32(b[offset:]) & 0x7FFFFFFF
 
 	// generate TOTP code by taking the modulo of the truncated hash
 	return fmt.Sprintf("%06d", truncatedHash%1_000_000), nil
+}
+
+func getHashInterfaces(algorithm Algorithm) func() hash.Hash {
+	switch algorithm {
+	case AlgorithmSHA1:
+		return sha1.New
+	case AlgorithmSHA256:
+		return sha256.New
+	case AlgorithmSHA512:
+		return sha512.New
+	}
+	panic(fmt.Sprintf("error getting hash interfaces for algorithm + %s", algorithm))
 }
