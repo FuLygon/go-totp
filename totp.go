@@ -50,16 +50,16 @@ func (t TOTP) GetURL() (string, error) {
 	}
 
 	totpUrl := url.URL{
-		Scheme: "otpauth",
-		Host:   "totp",
-		Path:   label(t.Issuer, t.AccountName),
+		Scheme: totpScheme,
+		Host:   totpHost,
+		Path:   fmt.Sprintf("%s:%s", t.Issuer, t.AccountName),
 	}
 
 	parameters := url.Values{}
-	parameters.Add("algorithm", "SHA1")
-	parameters.Add("digits", "6")
+	parameters.Add("algorithm", algorithmSHA1)
+	parameters.Add("digits", digits)
 	parameters.Add("issuer", t.Issuer)
-	parameters.Add("period", "30")
+	parameters.Add("period", period)
 	parameters.Add("secret", t.Secret)
 	totpUrl.RawQuery = parameters.Encode()
 
@@ -138,8 +138,4 @@ func ValidateWithTimestamp(code int, secret string, timestamp int64) (bool, erro
 	}
 
 	return false, nil
-}
-
-func label(issuer, accountName string) string {
-	return fmt.Sprintf("%s:%s", issuer, accountName)
 }
