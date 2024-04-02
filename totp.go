@@ -115,7 +115,7 @@ func (t TOTP) validateData() error {
 	return nil
 }
 
-func Validate(code int, secret string) (bool, error) {
+func Validate(code string, secret string) (bool, error) {
 	// generate totp based on current timestamp
 	generatedCode, err := generateTotp(secret, time.Now().Unix())
 	if err != nil {
@@ -123,14 +123,14 @@ func Validate(code int, secret string) (bool, error) {
 	}
 
 	// check if code is valid
-	if code == int(generatedCode) {
+	if code == generatedCode {
 		return true, nil
 	}
 
 	return false, nil
 }
 
-func ValidateWithTimestamp(code int, secret string, timestamp int64) (bool, error) {
+func ValidateWithTimestamp(code string, secret string, timestamp int64) (bool, error) {
 	// generate totp based on timestamp parameter
 	generatedCode, err := generateTotp(secret, timestamp)
 	if err != nil {
@@ -138,7 +138,7 @@ func ValidateWithTimestamp(code int, secret string, timestamp int64) (bool, erro
 	}
 
 	// check if code is valid
-	if code == int(generatedCode) {
+	if code == generatedCode {
 		return true, nil
 	}
 

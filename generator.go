@@ -19,14 +19,14 @@ func generateSecret(length int) (string, error) {
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buffer)[:length], nil
 }
 
-func generateTotp(secretKey string, timestamp int64) (uint32, error) {
+func generateTotp(secretKey string, timestamp int64) (string, error) {
 	base32Decoder := base32.StdEncoding.WithPadding(base32.NoPadding)
 	// convert secret to uppercase and remove extra spaces
 	secretKey = strings.ToUpper(strings.TrimSpace(secretKey))
 	// decode the base32-encoded secret key into bytes
 	secretBytes, err := base32Decoder.DecodeString(secretKey)
 	if err != nil {
-		return 0, fmt.Errorf("failed to decode secret: " + err.Error())
+		return "", fmt.Errorf("failed to decode secret: " + err.Error())
 	}
 
 	// The truncated timestamp / 30 is converted to an 8-byte big-endian
@@ -49,5 +49,5 @@ func generateTotp(secretKey string, timestamp int64) (uint32, error) {
 	truncatedHash := binary.BigEndian.Uint32(h[offset:]) & 0x7FFFFFFF
 
 	// generate TOTP code by taking the modulo of the truncated hash
-	return truncatedHash % 1_000_000, nil
+	return fmt.Sprintf("%06d", truncatedHash%1_000_000), nil
 }
