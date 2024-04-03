@@ -3,13 +3,9 @@ package totp
 import (
 	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/base32"
 	"encoding/binary"
 	"fmt"
-	"hash"
 	"strings"
 )
 
@@ -41,7 +37,7 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits
 	// timestamp bytes are concatenated with the decoded secret key bytes
 	// then a 20-byte hash is calculated from the byte slice
 	// and the hash with 0x0F (15) to get a single-digit offset
-	h := hmac.New(getHashInterfaces(algorithm), secretBytes)
+	h := hmac.New(algorithm.hash(), secretBytes)
 	h.Write(timeBytes)
 	b := h.Sum(nil)
 	offset := b[len(b)-1] & 0x0F
@@ -60,16 +56,4 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits
 	default:
 		panic(ErrInvalidDigits)
 	}
-}
-
-func getHashInterfaces(algorithm Algorithm) func() hash.Hash {
-	switch algorithm {
-	case AlgorithmSHA1:
-		return sha1.New
-	case AlgorithmSHA256:
-		return sha256.New
-	case AlgorithmSHA512:
-		return sha512.New
-	}
-	panic("failed to get hash interfaces for algorithm")
 }
