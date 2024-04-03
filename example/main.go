@@ -14,7 +14,7 @@ var (
 	accountName         = "example@example.com"
 	algorithm           = totp.AlgorithmSHA1
 	digits       uint8  = 6
-	period       uint64 = 30
+	period       uint64 = 30 // period might get ignored in some app like Google Authenticator
 	customSecret        = "IZMPDHTBXXOYYWR4SC4Q"
 )
 
