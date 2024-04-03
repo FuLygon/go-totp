@@ -9,11 +9,14 @@ import (
 	"image"
 	"net/url"
 	"regexp"
+	"strconv"
 	"time"
 )
 
 type TOTP struct {
 	Algorithm   Algorithm
+	Digits      uint8
+	Period      uint64
 	Issuer      string
 	AccountName string
 	Secret      string
@@ -24,7 +27,7 @@ type TOTPQR struct {
 	Image  image.Image
 }
 
-func Generate(issuer, accountName string, algorithm Algorithm) (totp TOTP, err error) {
+func Generate(issuer, accountName string, algorithm Algorithm, digits uint8, period uint64) (totp TOTP, err error) {
 	totp.Issuer = issuer
 	totp.AccountName = accountName
 
@@ -33,6 +36,20 @@ func Generate(issuer, accountName string, algorithm Algorithm) (totp TOTP, err e
 		totp.Algorithm = AlgorithmSHA1
 	} else {
 		totp.Algorithm = algorithm
+	}
+
+	// assign default value for digits
+	if digits == 0 {
+		totp.Digits = 6
+	} else {
+		totp.Digits = digits
+	}
+
+	// assign default value for period
+	if period == 0 {
+		totp.Period = 30
+	} else {
+		totp.Period = period
 	}
 
 	// generate a base32 secret
@@ -65,9 +82,9 @@ func (t TOTP) GetURL() (string, error) {
 
 	parameters := url.Values{}
 	parameters.Add("algorithm", fmt.Sprintf("%s", t.Algorithm))
-	parameters.Add("digits", digits)
+	parameters.Add("digits", strconv.FormatUint(uint64(t.Digits), 10))
 	parameters.Add("issuer", t.Issuer)
-	parameters.Add("period", period)
+	parameters.Add("period", strconv.FormatUint(t.Period, 10))
 	parameters.Add("secret", t.Secret)
 	totpUrl.RawQuery = parameters.Encode()
 
@@ -111,7 +128,7 @@ func (t TOTP) validateData() error {
 	if t.Algorithm != AlgorithmSHA1 && t.Algorithm != AlgorithmSHA256 && t.Algorithm != AlgorithmSHA512 {
 		return errors.New("invalid or unsupported algorithm")
 	}
-	
+
 	if t.Issuer == "" {
 		return errors.New("issuer cannot be empty")
 	}
@@ -131,9 +148,9 @@ func (t TOTP) validateData() error {
 	return nil
 }
 
-func Validate(algorithm Algorithm, code string, secret string) (bool, error) {
+func Validate(algorithm Algorithm, digits uint8, period uint64, code string, secret string) (bool, error) {
 	// generate totp based on current timestamp
-	generatedCode, err := generateTotp(secret, time.Now().Unix(), algorithm)
+	generatedCode, err := generateTotp(secret, time.Now().Unix(), algorithm, digits, period)
 	if err != nil {
 		return false, err
 	}
@@ -146,9 +163,9 @@ func Validate(algorithm Algorithm, code string, secret string) (bool, error) {
 	return false, nil
 }
 
-func ValidateWithTimestamp(algorithm Algorithm, code string, secret string, timestamp int64) (bool, error) {
+func ValidateWithTimestamp(algorithm Algorithm, digits uint8, period uint64, code string, secret string, timestamp int64) (bool, error) {
 	// generate totp based on timestamp parameter
-	generatedCode, err := generateTotp(secret, timestamp, algorithm)
+	generatedCode, err := generateTotp(secret, timestamp, algorithm, digits, period)
 	if err != nil {
 		return false, err
 	}

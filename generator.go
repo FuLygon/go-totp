@@ -22,7 +22,7 @@ func generateSecret(length int) (string, error) {
 	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(buffer)[:length], nil
 }
 
-func generateTotp(secretKey string, timestamp int64, algorithm Algorithm) (string, error) {
+func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits uint8, period uint64) (string, error) {
 	base32Decoder := base32.StdEncoding.WithPadding(base32.NoPadding)
 	// convert secret to uppercase and remove extra spaces
 	secretKey = strings.ToUpper(strings.TrimSpace(secretKey))
@@ -36,7 +36,7 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm) (strin
 	// unsigned integer slice
 	// convert timestamp to bytes, divide by 30
 	timeBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(timeBytes, uint64(timestamp)/30)
+	binary.BigEndian.PutUint64(timeBytes, uint64(timestamp)/period)
 
 	// timestamp bytes are concatenated with the decoded secret key bytes
 	// then a 20-byte SHA-1 hash is calculated from the byte slice
@@ -52,7 +52,14 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm) (strin
 	truncatedHash := binary.BigEndian.Uint32(b[offset:]) & 0x7FFFFFFF
 
 	// generate TOTP code by taking the modulo of the truncated hash
-	return fmt.Sprintf("%06d", truncatedHash%1_000_000), nil
+	switch digits {
+	case 6:
+		return fmt.Sprintf("%06d", truncatedHash%1_000_000), nil
+	case 8:
+		return fmt.Sprintf("%08d", truncatedHash%100_000_000), nil
+	default:
+		panic("invalid digits value")
+	}
 }
 
 func getHashInterfaces(algorithm Algorithm) func() hash.Hash {

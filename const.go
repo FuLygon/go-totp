@@ -3,8 +3,6 @@ package totp
 const (
 	totpScheme = "otpauth"
 	totpHost   = "totp"
-	digits     = "6"
-	period     = "30"
 )
 
 type Algorithm string
