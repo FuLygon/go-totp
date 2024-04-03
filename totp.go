@@ -121,12 +121,27 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, 
 }
 
 func (t TOTP) validateData() error {
+	// validate algorithm
 	if t.Algorithm == "" {
 		return errors.New("algorithm cannot be empty")
 	}
 
 	if t.Algorithm != AlgorithmSHA1 && t.Algorithm != AlgorithmSHA256 && t.Algorithm != AlgorithmSHA512 {
 		return errors.New("invalid or unsupported algorithm")
+	}
+
+	// validate digits
+	if t.Digits == 0 {
+		return errors.New("digits cannot be empty")
+	}
+
+	if t.Digits != 6 && t.Digits != 8 {
+		return errors.New("invalid or unsupported digits")
+	}
+
+	// validate period
+	if t.Period == 0 {
+		return errors.New("period cannot be empty")
 	}
 
 	if t.Issuer == "" {
