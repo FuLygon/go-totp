@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 type TOTP struct {
@@ -77,7 +76,7 @@ func (t TOTP) GetURL() (string, error) {
 	totpUrl := url.URL{
 		Scheme: totpScheme,
 		Host:   totpHost,
-		Path:   fmt.Sprintf("%s:%s", t.Issuer, t.AccountName),
+		Path:   label(t.Issuer, t.AccountName),
 	}
 
 	parameters := url.Values{}
@@ -163,32 +162,6 @@ func (t TOTP) validateData() error {
 	return nil
 }
 
-func Validate(algorithm Algorithm, digits uint8, period uint64, code string, secret string) (bool, error) {
-	// generate totp based on current timestamp
-	generatedCode, err := generateTotp(secret, time.Now().Unix(), algorithm, digits, period)
-	if err != nil {
-		return false, err
-	}
-
-	// check if code is valid
-	if code == generatedCode {
-		return true, nil
-	}
-
-	return false, nil
-}
-
-func ValidateWithTimestamp(algorithm Algorithm, digits uint8, period uint64, code string, secret string, timestamp int64) (bool, error) {
-	// generate totp based on timestamp parameter
-	generatedCode, err := generateTotp(secret, timestamp, algorithm, digits, period)
-	if err != nil {
-		return false, err
-	}
-
-	// check if code is valid
-	if code == generatedCode {
-		return true, nil
-	}
-
-	return false, nil
+func label(issuer, accountName string) string {
+	return fmt.Sprintf("%s:%s", issuer, accountName)
 }
