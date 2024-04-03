@@ -58,7 +58,7 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits
 	case 8:
 		return fmt.Sprintf("%08d", truncatedHash%100_000_000), nil
 	default:
-		panic("invalid digits value")
+		panic(ErrInvalidDigits)
 	}
 }
 
@@ -71,5 +71,5 @@ func getHashInterfaces(algorithm Algorithm) func() hash.Hash {
 	case AlgorithmSHA512:
 		return sha512.New
 	}
-	panic(fmt.Sprintf("error getting hash interfaces for algorithm"))
+	panic("failed to get hash interfaces for algorithm")
 }

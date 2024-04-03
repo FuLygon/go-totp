@@ -122,41 +122,41 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, erro
 func (t TOTP) validateData() error {
 	// validate algorithm
 	if t.Algorithm == "" {
-		return errors.New("algorithm cannot be empty")
+		return ErrEmptyAlgorithm
 	}
 
 	if t.Algorithm != AlgorithmSHA1 && t.Algorithm != AlgorithmSHA256 && t.Algorithm != AlgorithmSHA512 {
-		return errors.New("invalid or unsupported algorithm")
+		return ErrInvalidAlgorithm
 	}
 
 	// validate digits
 	if t.Digits == 0 {
-		return errors.New("digits cannot be empty")
+		return ErrEmptyDigits
 	}
 
 	if t.Digits != 6 && t.Digits != 8 {
-		return errors.New("invalid or unsupported digits")
+		return ErrInvalidDigits
 	}
 
 	// validate period
 	if t.Period == 0 {
-		return errors.New("period cannot be empty")
+		return ErrEmptyPeriod
 	}
 
 	if t.Issuer == "" {
-		return errors.New("issuer cannot be empty")
+		return ErrEmptyIssuer
 	}
 
 	if t.AccountName == "" {
-		return errors.New("account name cannot be empty")
+		return ErrEmptyAccountName
 	}
 
 	if t.Secret == "" {
-		return errors.New("secret cannot be empty")
+		return ErrEmptySecret
 	}
 
 	if !regexp.MustCompile("^[A-Z2-7]+$").MatchString(t.Secret) {
-		return errors.New("secret is not a valid base32")
+		return ErrInvalidSecret
 	}
 
 	return nil
