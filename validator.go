@@ -1,6 +1,9 @@
 package totp
 
-import "time"
+import (
+	"regexp"
+	"time"
+)
 
 type Validator struct {
 	Algorithm Algorithm
@@ -10,6 +13,12 @@ type Validator struct {
 }
 
 func (v Validator) Validate(code string) (bool, error) {
+	// validate validator info
+	err := v.validateData()
+	if err != nil {
+		return false, err
+	}
+
 	// generate totp based on current timestamp
 	generatedCode, err := generateTotp(v.Secret, time.Now().Unix(), v.Algorithm, v.Digits, v.Period)
 	if err != nil {
@@ -25,6 +34,12 @@ func (v Validator) Validate(code string) (bool, error) {
 }
 
 func (v Validator) ValidateWithTimestamp(code string, timestamp int64) (bool, error) {
+	// validate validator info
+	err := v.validateData()
+	if err != nil {
+		return false, err
+	}
+
 	// generate totp based on timestamp parameter
 	generatedCode, err := generateTotp(v.Secret, timestamp, v.Algorithm, v.Digits, v.Period)
 	if err != nil {
@@ -37,4 +52,39 @@ func (v Validator) ValidateWithTimestamp(code string, timestamp int64) (bool, er
 	}
 
 	return false, nil
+}
+
+func (v Validator) validateData() error {
+	// validate algorithm
+	if v.Algorithm == "" {
+		return ErrEmptyAlgorithm
+	}
+
+	if v.Algorithm != AlgorithmSHA1 && v.Algorithm != AlgorithmSHA256 && v.Algorithm != AlgorithmSHA512 {
+		return ErrInvalidAlgorithm
+	}
+
+	// validate digits
+	if v.Digits == 0 {
+		return ErrEmptyDigits
+	}
+
+	if v.Digits != 6 && v.Digits != 8 {
+		return ErrInvalidDigits
+	}
+
+	// validate period
+	if v.Period == 0 {
+		return ErrEmptyPeriod
+	}
+
+	if v.Secret == "" {
+		return ErrEmptySecret
+	}
+
+	if !regexp.MustCompile("^[A-Z2-7]+$").MatchString(v.Secret) {
+		return ErrInvalidSecret
+	}
+
+	return nil
 }
