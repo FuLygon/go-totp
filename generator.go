@@ -71,5 +71,5 @@ func getHashInterfaces(algorithm Algorithm) func() hash.Hash {
 	case AlgorithmSHA512:
 		return sha512.New
 	}
-	panic(fmt.Sprintf("error getting hash interfaces for algorithm + %s", algorithm))
+	panic(fmt.Sprintf("error getting hash interfaces for algorithm")
 }
