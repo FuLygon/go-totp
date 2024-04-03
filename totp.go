@@ -21,7 +21,7 @@ type TOTP struct {
 	Secret      string
 }
 
-type TOTPQR struct {
+type QR struct {
 	Base64 string
 	Image  image.Image
 }
@@ -90,10 +90,10 @@ func (t TOTP) GetURL() (string, error) {
 	return totpUrl.String(), nil
 }
 
-func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, error) {
+func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, error) {
 	totpUrl, err := t.GetURL()
 	if err != nil {
-		return TOTPQR{}, err
+		return QR{}, err
 	}
 
 	// assign default value for qrcode recovery level if not provided
@@ -104,7 +104,7 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, 
 	// generate qrcode
 	bQR, err := qrcode.Encode(totpUrl, qrRecoveryLevel[0], size)
 	if err != nil {
-		return TOTPQR{}, errors.New("failed to encode QR code: " + err.Error())
+		return QR{}, errors.New("failed to encode QR code: " + err.Error())
 	}
 
 	// create base64 string
@@ -114,9 +114,9 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (TOTPQR, 
 	reader := bytes.NewReader(bQR)
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		return TOTPQR{}, errors.New("failed to decode image: " + err.Error())
+		return QR{}, errors.New("failed to decode image: " + err.Error())
 	}
-	return TOTPQR{Base64: strB64, Image: img}, nil
+	return QR{Base64: strB64, Image: img}, nil
 }
 
 func (t TOTP) validateData() error {
