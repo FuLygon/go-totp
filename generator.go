@@ -37,7 +37,7 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits
 	// timestamp bytes are concatenated with the decoded secret key bytes
 	// then a 20-byte hash is calculated from the byte slice
 	// and the hash with 0x0F (15) to get a single-digit offset
-	h := hmac.New(algorithm.hash(), secretBytes)
+	h := hmac.New(algorithm.hash, secretBytes)
 	h.Write(timeBytes)
 	b := h.Sum(nil)
 	offset := b[len(b)-1] & 0x0F

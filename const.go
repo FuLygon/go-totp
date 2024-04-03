@@ -20,14 +20,14 @@ const (
 	AlgorithmSHA512 Algorithm = "SHA512"
 )
 
-func (a Algorithm) hash() func() hash.Hash {
+func (a Algorithm) hash() hash.Hash {
 	switch a {
 	case AlgorithmSHA1:
-		return sha1.New
+		return sha1.New()
 	case AlgorithmSHA256:
-		return sha256.New
+		return sha256.New()
 	case AlgorithmSHA512:
-		return sha512.New
+		return sha512.New()
 	}
 	panic("failed to get hash interfaces")
 }
