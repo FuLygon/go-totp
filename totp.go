@@ -126,7 +126,7 @@ func (t TOTP) validateData() error {
 	}
 
 	// validate digits
-	if t.Digits != 6 && t.Digits != 8 {
+	if t.Digits == 0 || t.Digits > 10 {
 		return ErrInvalidDigits
 	}
 

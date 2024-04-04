@@ -61,7 +61,7 @@ func (v Validator) validateData() error {
 	}
 
 	// validate digits
-	if v.Digits != 6 && v.Digits != 8 {
+	if v.Digits == 0 || v.Digits > 10 {
 		return ErrInvalidDigits
 	}
 
