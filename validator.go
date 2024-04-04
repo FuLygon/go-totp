@@ -20,7 +20,7 @@ func (v Validator) Validate(code string) (bool, error) {
 	}
 
 	// generate totp based on current timestamp
-	generatedCode, err := generateTotp(v.Secret, time.Now().Unix(), v.Algorithm, v.Digits, v.Period)
+	generatedCode, err := generateTotp(v.Secret, time.Now().UTC().Unix(), v.Algorithm, v.Digits, v.Period)
 	if err != nil {
 		return false, err
 	}
