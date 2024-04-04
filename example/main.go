@@ -13,9 +13,9 @@ import (
 var (
 	issuer              = "example.com"
 	accountName         = "example@example.com"
-	algorithm           = totp.AlgorithmSHA1 // the commonly supported value is AlgorithmSHA1, but might get ignored or unsupported by some app.
-	digits       uint8  = 6                  // the commonly supported values are 6 and 8, but might get ignored or unsupported by some app, the allowed value range is between 1 and 10.
-	period       uint64 = 30                 // the commonly supported values are 30 and 60, but might get ignored or unsupported by most app.
+	algorithm           = totp.AlgorithmSHA1 // the commonly supported value is AlgorithmSHA1, other value might get ignored or unsupported by some app.
+	digits       uint8  = 6                  // the commonly supported values are 6 and 8, other value might get ignored or unsupported by some app, the allowed value range is between 1 and 10.
+	period       uint64 = 30                 // the commonly supported values are 30 and 60, other value might get ignored or unsupported by most app.
 	customSecret        = "IZMPDHTBXXOYYWR4SC4Q"
 )
 
