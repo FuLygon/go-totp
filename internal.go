@@ -6,6 +6,7 @@ import (
 	"encoding/base32"
 	"encoding/binary"
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -48,12 +49,5 @@ func generateTotp(secretKey string, timestamp int64, algorithm Algorithm, digits
 	truncatedHash := binary.BigEndian.Uint32(b[offset:]) & 0x7FFFFFFF
 
 	// return generated TOTP code by taking the modulo of the truncated hash
-	switch digits {
-	case 6:
-		return fmt.Sprintf("%06d", truncatedHash%1_000_000), nil
-	case 8:
-		return fmt.Sprintf("%08d", truncatedHash%100_000_000), nil
-	default:
-		panic(ErrInvalidDigits)
-	}
+	return fmt.Sprintf(fmt.Sprintf("%%0%dd", digits), truncatedHash%uint32(math.Pow(10, float64(digits)))), nil
 }
