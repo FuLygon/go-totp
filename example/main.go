@@ -9,12 +9,13 @@ import (
 	"strings"
 )
 
+// all parameters were fully supported by Aegis Authenticator (https://play.google.com/store/apps/details?id=com.beemdevelopment.aegis)
 var (
 	issuer              = "example.com"
 	accountName         = "example@example.com"
-	algorithm           = totp.AlgorithmSHA1
-	digits       uint8  = 6
-	period       uint64 = 30 // period might get ignored in some app like Google Authenticator
+	algorithm           = totp.AlgorithmSHA1 // the commonly supported value is AlgorithmSHA1, but might get ignored or unsupported by some app.
+	digits       uint8  = 6                  // the commonly supported values are 6 and 8, but might get ignored or unsupported by some app, the allowed value range is between 1 and 10.
+	period       uint64 = 30                 // the commonly supported values are 30 and 60, but might get ignored or unsupported by most app.
 	customSecret        = "IZMPDHTBXXOYYWR4SC4Q"
 )
 
