@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/FuLygon/go-totp"
+	"github.com/FuLygon/go-totp/v2"
 	"github.com/skip2/go-qrcode"
 	"image/png"
 	"os"
