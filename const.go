@@ -7,7 +7,7 @@ import (
 	"hash"
 )
 
-// url format
+// url format for totp
 const (
 	totpScheme = "otpauth"
 	totpHost   = "totp"
@@ -22,7 +22,7 @@ const (
 	paramSecret    = "secret"
 )
 
-// Algorithm is hashing functions for generating OTP
+// Algorithm represents hashing functions for generating OTP
 type Algorithm string
 
 const (

@@ -5,13 +5,19 @@ import (
 	"time"
 )
 
+// Validator defines the structure used for TOTP validation
 type Validator struct {
+	// Hashing function of the TOTP.
 	Algorithm Algorithm
-	Digits    uint8
-	Period    uint64
-	Secret    string
+	// Number of digits of the TOTP.
+	Digits uint8
+	// Time period (seconds) of the TOTP
+	Period uint64
+	// Base32 encoded shared secret key of the TOTP.
+	Secret string
 }
 
+// Validate validates the provided TOTP code against the current timestamp
 func (v Validator) Validate(code string) (bool, error) {
 	// validate validator info
 	err := v.validateData()
@@ -33,6 +39,7 @@ func (v Validator) Validate(code string) (bool, error) {
 	return false, nil
 }
 
+// ValidateWithTimestamp validates the provided TOTP code against a specific timestamp
 func (v Validator) ValidateWithTimestamp(code string, timestamp int64) (bool, error) {
 	// validate validator info
 	err := v.validateData()

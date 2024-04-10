@@ -12,43 +12,56 @@ import (
 	"strconv"
 )
 
+// TOTP represents a Time-Based One-Time Password.
 type TOTP struct {
+	// Name of the account associated with the TOTP. Required.
 	AccountName string
-	Issuer      string
-	Algorithm   Algorithm
-	Digits      uint8
-	Period      uint64
-	Secret      string
+	// Issuer or the service provider of the TOTP. Required.
+	Issuer string
+	// Hashing function of the TOTP. Default value is AlgorithmSHA1.
+	// The commonly supported values by most authenticator app are AlgorithmSHA1, other hash function might get ignored or unsupported by some authenticator app.
+	Algorithm Algorithm
+	// Number of digits of the TOTP. Default value is 6.
+	// Valid values are from 1 to 10.
+	// The commonly supported values by most authenticator app are 6 and 8, other value might get ignored or unsupported by some authenticator app.
+	Digits uint8
+	// Time period (seconds) of the TOTP. Default value is 30.
+	// The commonly supported values my some authenticator app are 30 and 60, other value might get ignored or unsupported by most authenticator app.
+	Period uint64
+	// Base32 encoded shared secret key of the TOTP.
+	Secret string
 }
 
+// QR represents a QR code.
 type QR struct {
-	Base64 string
-	Image  image.Image
+	Base64 string      // Base64 encoded string of the QR code.
+	Image  image.Image // Decoded image data of the QR code.
 }
 
+// New creates a new TOTP with a randomly generated shared secret, fields with default value will be used if null.
 func New(options TOTP) (totp TOTP, err error) {
-	// assign default value for algorithm
+	// assign default value for algorithm if null
 	if algorithm := options.Algorithm; algorithm == "" {
 		options.Algorithm = AlgorithmSHA1
 	} else {
 		options.Algorithm = algorithm
 	}
 
-	// assign default value for digits
+	// assign default value for digits if null
 	if digits := options.Digits; digits == 0 {
 		options.Digits = 6
 	} else {
 		options.Digits = digits
 	}
 
-	// assign default value for period
+	// assign default value for period if null
 	if period := options.Period; period == 0 {
 		options.Period = 30
 	} else {
 		options.Period = period
 	}
 
-	// generate a base32 secret
+	// generate a base32 shared secret
 	options.Secret, err = generateSecret(20)
 	if err != nil {
 		return
@@ -63,6 +76,7 @@ func New(options TOTP) (totp TOTP, err error) {
 	return options, nil
 }
 
+// GetURL generates a TOTP URL string following the TOTP standard format.
 func (t TOTP) GetURL() (string, error) {
 	// validate totp info
 	err := t.validateData()
@@ -87,6 +101,9 @@ func (t TOTP) GetURL() (string, error) {
 	return totpUrl.String(), nil
 }
 
+// GetQR generates a QR code image for the TOTP with optional recovery level.
+// Default value for recovery level is qrcode.Medium.
+// See https://pkg.go.dev/github.com/skip2/go-qrcode@v0.0.0-20200617195104-da1b6568686e#RecoveryLevel for additional details on QR code recovery level.
 func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, error) {
 	totpUrl, err := t.GetURL()
 	if err != nil {
