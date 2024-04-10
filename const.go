@@ -13,7 +13,7 @@ const (
 	totpHost   = "totp"
 )
 
-// query parameters
+// totp url query parameters
 const (
 	paramAlgorithm = "algorithm"
 	paramDigits    = "digits"
