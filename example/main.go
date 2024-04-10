@@ -21,7 +21,10 @@ var (
 
 func main() {
 	// generate totp info with random secret
-	totpInfo, err := totp.New(issuer, accountName, algorithm, digits, period)
+	totpInfo, err := totp.New(totp.TOTP{
+		AccountName: accountName,
+		Issuer:      issuer,
+	})
 	if err != nil {
 		panic(err)
 	}
