@@ -134,6 +134,16 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, erro
 }
 
 func (t TOTP) validateData() error {
+	// validate account name
+	if t.AccountName == "" {
+		return ErrEmptyAccountName
+	}
+
+	// validate issuer
+	if t.Issuer == "" {
+		return ErrEmptyIssuer
+	}
+
 	// validate algorithm
 	if t.Algorithm != AlgorithmSHA1 && t.Algorithm != AlgorithmSHA256 && t.Algorithm != AlgorithmSHA512 {
 		return ErrInvalidAlgorithm
@@ -147,16 +157,6 @@ func (t TOTP) validateData() error {
 	// validate period
 	if t.Period == 0 {
 		return ErrInvalidPeriod
-	}
-
-	// validate issuer
-	if t.Issuer == "" {
-		return ErrEmptyIssuer
-	}
-
-	// validate account name
-	if t.AccountName == "" {
-		return ErrEmptyAccountName
 	}
 
 	// validate secret
