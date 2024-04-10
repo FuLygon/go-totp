@@ -34,8 +34,10 @@ type TOTP struct {
 
 // QR represents a QR code.
 type QR struct {
-	Base64 string      // Base64 encoded string of the QR code.
-	Image  image.Image // Decoded image data of the QR code.
+	// Base64 encoded string of the QR code.
+	Base64 string
+	// Decoded image data of the QR code.
+	Image image.Image
 }
 
 // New creates a new TOTP with a randomly generated shared secret, fields with default value will be used if null.
