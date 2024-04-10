@@ -13,11 +13,11 @@ import (
 )
 
 type TOTP struct {
+	AccountName string
+	Issuer      string
 	Algorithm   Algorithm
 	Digits      uint8
 	Period      uint64
-	Issuer      string
-	AccountName string
 	Secret      string
 }
 
@@ -26,44 +26,41 @@ type QR struct {
 	Image  image.Image
 }
 
-func New(issuer, accountName string, algorithm Algorithm, digits uint8, period uint64) (totp TOTP, err error) {
-	totp.Issuer = issuer
-	totp.AccountName = accountName
-
+func New(options TOTP) (totp TOTP, err error) {
 	// assign default value for algorithm
-	if algorithm == "" {
-		totp.Algorithm = AlgorithmSHA1
+	if algorithm := options.Algorithm; algorithm == "" {
+		options.Algorithm = AlgorithmSHA1
 	} else {
-		totp.Algorithm = algorithm
+		options.Algorithm = algorithm
 	}
 
 	// assign default value for digits
-	if digits == 0 {
-		totp.Digits = 6
+	if digits := options.Digits; digits == 0 {
+		options.Digits = 6
 	} else {
-		totp.Digits = digits
+		options.Digits = digits
 	}
 
 	// assign default value for period
-	if period == 0 {
-		totp.Period = 30
+	if period := options.Period; period == 0 {
+		options.Period = 30
 	} else {
-		totp.Period = period
+		options.Period = period
 	}
 
 	// generate a base32 secret
-	totp.Secret, err = generateSecret(20)
+	options.Secret, err = generateSecret(20)
 	if err != nil {
 		return
 	}
 
 	// validate totp info
-	err = totp.validateData()
+	err = options.validateData()
 	if err != nil {
 		return
 	}
 
-	return
+	return options, nil
 }
 
 func (t TOTP) GetURL() (string, error) {
