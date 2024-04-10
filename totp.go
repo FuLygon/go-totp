@@ -26,7 +26,7 @@ type QR struct {
 	Image  image.Image
 }
 
-func Generate(issuer, accountName string, algorithm Algorithm, digits uint8, period uint64) (totp TOTP, err error) {
+func New(issuer, accountName string, algorithm Algorithm, digits uint8, period uint64) (totp TOTP, err error) {
 	totp.Issuer = issuer
 	totp.AccountName = accountName
 
