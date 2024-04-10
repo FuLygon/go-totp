@@ -80,11 +80,11 @@ func (t TOTP) GetURL() (string, error) {
 	}
 
 	parameters := url.Values{}
-	parameters.Add("algorithm", fmt.Sprintf("%s", t.Algorithm))
-	parameters.Add("digits", strconv.FormatUint(uint64(t.Digits), 10))
-	parameters.Add("issuer", t.Issuer)
-	parameters.Add("period", strconv.FormatUint(t.Period, 10))
-	parameters.Add("secret", t.Secret)
+	parameters.Add(paramAlgorithm, fmt.Sprintf("%s", t.Algorithm))
+	parameters.Add(paramDigits, strconv.FormatUint(uint64(t.Digits), 10))
+	parameters.Add(paramIssuer, t.Issuer)
+	parameters.Add(paramPeriod, strconv.FormatUint(t.Period, 10))
+	parameters.Add(paramSecret, t.Secret)
 	totpUrl.RawQuery = parameters.Encode()
 
 	return totpUrl.String(), nil
