@@ -12,14 +12,14 @@ import (
 	"strconv"
 )
 
-// TOTP represents a Time-Based One-Time Password.
+// TOTP represents parameters for creating a Time-based One-Time Password.
 type TOTP struct {
 	// Name of the account associated with the TOTP. Required.
 	AccountName string
 	// Issuer or the service provider of the TOTP. Required.
 	Issuer string
 	// Hashing function of the TOTP. Default value is AlgorithmSHA1.
-	// The commonly supported values by most authenticator app are AlgorithmSHA1, other hash function might get ignored or unsupported by some authenticator app.
+	// The commonly supported value by most authenticator app is AlgorithmSHA1, other hash functions might get ignored or unsupported by some authenticator app.
 	Algorithm Algorithm
 	// Number of digits of the TOTP. Default value is 6.
 	// Valid values are from 1 to 10.
@@ -40,7 +40,7 @@ type QR struct {
 	Image image.Image
 }
 
-// New creates a new TOTP with a randomly generated shared secret, fields with default value will be used if null.
+// New creates a new TOTP with a randomly generated shared secret, default value will be used if null.
 func New(options TOTP) (totp TOTP, err error) {
 	// assign default value for algorithm if null
 	if algorithm := options.Algorithm; algorithm == "" {
