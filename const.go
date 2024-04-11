@@ -7,7 +7,6 @@ import (
 	"hash"
 )
 
-// url format for totp
 const (
 	totpScheme = "otpauth"
 	totpHost   = "totp"
