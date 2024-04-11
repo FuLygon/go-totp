@@ -61,6 +61,7 @@ func (v Validator) ValidateWithTimestamp(code string, timestamp int64) (bool, er
 	return false, nil
 }
 
+// validateData validates validator data.
 func (v Validator) validateData() error {
 	// validate algorithm
 	if v.Algorithm != AlgorithmSHA1 && v.Algorithm != AlgorithmSHA256 && v.Algorithm != AlgorithmSHA512 {

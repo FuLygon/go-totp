@@ -105,6 +105,7 @@ func (t TOTP) GetURL() (string, error) {
 
 // GetQR generates a QR code image for the TOTP with optional recovery level.
 // Default value for recovery level is qrcode.Medium.
+//
 // See https://pkg.go.dev/github.com/skip2/go-qrcode@v0.0.0-20200617195104-da1b6568686e#RecoveryLevel for additional details on QR code recovery level.
 func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, error) {
 	totpUrl, err := t.GetURL()
@@ -135,6 +136,7 @@ func (t TOTP) GetQR(size int, qrRecoveryLevel ...qrcode.RecoveryLevel) (QR, erro
 	return QR{Base64: strB64, Image: img}, nil
 }
 
+// validateData validates TOTP data.
 func (t TOTP) validateData() error {
 	// validate account name
 	if t.AccountName == "" {
