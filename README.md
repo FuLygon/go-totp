@@ -1,8 +1,11 @@
 # go-totp
 
+[![Github tag](https://badgen.net/github/tag/FuLygon/go-totp)](https://github.com/FuLygon/go-totp/tags)
+[![GoReportCard](https://goreportcard.com/badge/github.com/FuLygon/go-totp/v2)](https://goreportcard.com/report/github.com/FuLygon/go-totp/v2)
+
 Package `go-totp` library implements functionalities to create and validate Time-Based One-Time Password (TOTP) for Two-Factor Authentication (2FA) applications. 
 
-TOTP generates temporary, single-use codes based on a shared secret key, enhancing login security.
+TOTP generates temporary codes based on a shared secret key, enhancing security.
 
 ## Installation
 Use `go get`
@@ -13,6 +16,9 @@ Import package
 ```go
 import "github.com/FuLygon/go-totp/v2"
 ```
+
+## Documentation
+[![GoDoc](https://godoc.org/github.com/FuLygon/go-totp/v2?status.svg)](https://pkg.go.dev/github.com/FuLygon/go-totp/v2#section-documentation)
 
 ## Example
 See [Example](example/main.go)
@@ -77,7 +83,7 @@ v := totp.Validator{
 }
 ```
 
-#### Validate a TOTP code
+#### Validate TOTP code
 ```go
 code := "123456" // user-provided TOTP code
 
