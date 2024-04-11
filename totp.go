@@ -12,7 +12,7 @@ import (
 	"strconv"
 )
 
-// TOTP represents parameters for creating a Time-based One-Time Password.
+// TOTP represents parameters of a Time-based One-Time Password.
 type TOTP struct {
 	// Name of the account associated with the TOTP. Required.
 	AccountName string
