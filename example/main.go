@@ -16,6 +16,7 @@ var (
 	algorithm           = totp.AlgorithmSHA1 // the commonly supported value is AlgorithmSHA1, other value might get ignored or unsupported by some app.
 	digits       uint8  = 6                  // the commonly supported values are 6 and 8, other value might get ignored or unsupported by some app, the allowed value range is between 1 and 10.
 	period       uint64 = 30                 // the commonly supported values are 30 and 60, other value might get ignored or unsupported by most app.
+	skew         uint   = 1
 	customSecret        = "IZMPDHTBXXOYYWR4SC4Q"
 )
 
@@ -85,6 +86,7 @@ func main() {
 			Algorithm: totpInfo.Algorithm,
 			Digits:    totpInfo.Digits,
 			Period:    totpInfo.Period,
+			Skew:      skew,
 			Secret:    totpInfo.Secret,
 		}
 
