@@ -22,28 +22,7 @@ type Validator struct {
 
 // Validate validates the provided TOTP code against the current timestamp
 func (v Validator) Validate(code string) (bool, error) {
-	// validate validator info
-	err := v.validateData()
-	if err != nil {
-		return false, err
-	}
-
-	timestamp := time.Now().Unix()
-
-	for i := -int64(v.Skew); i <= int64(v.Skew); i++ {
-		// generate totp based on timestamp parameter
-		generatedCode, err := generateTotp(v.Secret, timestamp+int64(v.Period)*i, v.Algorithm, v.Digits, v.Period)
-		if err != nil {
-			return false, err
-		}
-
-		// check if code is valid
-		if code == generatedCode {
-			return true, nil
-		}
-	}
-
-	return false, nil
+	return v.ValidateWithTimestamp(code, time.Now().Unix())
 }
 
 // ValidateWithTimestamp validates the provided TOTP code against a specific timestamp
