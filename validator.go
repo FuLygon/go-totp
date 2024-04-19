@@ -11,6 +11,9 @@ type Validator struct {
 	Algorithm Algorithm
 	// Number of digits of the TOTP.
 	Digits uint8
+	// Skew defines the number of periods before and after the current period that are considered valid.
+	// This is used to account for slight differences in time between the client and the server.
+	Skew uint
 	// Time period (seconds) of the TOTP
 	Period uint64
 	// Base32 encoded shared secret key of the TOTP.
@@ -25,15 +28,19 @@ func (v Validator) Validate(code string) (bool, error) {
 		return false, err
 	}
 
-	// generate totp based on current timestamp
-	generatedCode, err := generateTotp(v.Secret, time.Now().UTC().Unix(), v.Algorithm, v.Digits, v.Period)
-	if err != nil {
-		return false, err
-	}
+	timestamp := time.Now().Unix()
 
-	// check if code is valid
-	if code == generatedCode {
-		return true, nil
+	for i := -int64(v.Skew); i <= int64(v.Skew); i++ {
+		// generate totp based on timestamp parameter
+		generatedCode, err := generateTotp(v.Secret, timestamp+int64(v.Period)*i, v.Algorithm, v.Digits, v.Period)
+		if err != nil {
+			return false, err
+		}
+
+		// check if code is valid
+		if code == generatedCode {
+			return true, nil
+		}
 	}
 
 	return false, nil
@@ -47,15 +54,17 @@ func (v Validator) ValidateWithTimestamp(code string, timestamp int64) (bool, er
 		return false, err
 	}
 
-	// generate totp based on timestamp parameter
-	generatedCode, err := generateTotp(v.Secret, timestamp, v.Algorithm, v.Digits, v.Period)
-	if err != nil {
-		return false, err
-	}
+	for i := -int64(v.Skew); i <= int64(v.Skew); i++ {
+		// generate totp based on timestamp parameter
+		generatedCode, err := generateTotp(v.Secret, timestamp+int64(v.Period)*i, v.Algorithm, v.Digits, v.Period)
+		if err != nil {
+			return false, err
+		}
 
-	// check if code is valid
-	if code == generatedCode {
-		return true, nil
+		// check if code is valid
+		if code == generatedCode {
+			return true, nil
+		}
 	}
 
 	return false, nil
