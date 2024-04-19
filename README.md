@@ -90,7 +90,7 @@ code := "123456" // user-provided TOTP code
 valid, err := v.Validate(code)
 if err != nil {
     // handle error
-    fmt.Println("error validating TOTP code:", err)
+    log.Println("error validating TOTP code:", err)
     return
 }
 
